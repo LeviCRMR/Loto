@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="styleLoto.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Loto</title>
+</head>
+
+<body class="container-fluid">
+	<a class="row btn btn-dark btnwarning" href=https://www.joueurs-info-service.fr/ target="_blank" role="button">Jouer
+		comporte des risques : endettement, isolement, dépendance. Pour être aidé appelez le 09.74.75.13.13.(appel non
+		surtaxé)</a>
+
+	<h1 class="row display-4 center text-light">Grand Loto National</h1><br>
+	<button type="button" class="row btn btn-dark" data-toggle="tooltip" data-placement="right"
+		title="Pour jouer au loto, il vous suffit de choisir 6 numéros : 5 numéros allant de 1 à 49 et 1 numéro chance allant de 1 à 10 et de cliquer sur le bouton 'Jouer'. Vous remportez le jackpot si vous avez 5 numéros gagnants et le numéro complémentaire. Depuis novembre 2019, vous pouvez également choisir l'option 'A quand le jackpot ?' qui permet de savoir dans combien de temps vous auriez remporté le jackpot si vous aviez joué une fois par semaine. ">
+		Pointer le curseur pour voir les règles du jeu
+	</button>
+	<a class="row btn font-weight-bold gain" role="button">Vous vous sentez chanceux ? Jouez et tentez de gagner un
+		jackpot à hauteur de 65 000 000 € !</a>
+	<div class="row">
+
+		<input type="text" class="form-control col-lg-2 col-md-6" id="number1" placeholder="NOMBRE 1">
+		<input type="text" class="form-control col-lg-2 col-md-6" id="number2" placeholder="NOMBRE 2">
+		<input type="text" class="form-control col-lg-2 col-md-6" id="number3" placeholder="NOMBRE 3">
+		<input type="text" class="form-control col-lg-2 col-md-6" id="number4" placeholder="NOMBRE 4">
+		<input type="text" class="form-control col-lg-2 col-md-6" id="number5" placeholder="NOMBRE 5">
+		<input type="text" class="form-control col-lg-2 col-md-6" id="numberStar" placeholder="NOMBRE ETOILE">
+	</div>
+	<div class="row">
+		<button class="col-6 btn btn-primary" onclick="playOnceButton()">Jouer</button>
+		<button class="col-6 btn btn-success" onclick="whenWinButton()">À quand le jackpot ?</button>
+	</div>
+	<div id="erreur" class="row alert-danger h3" style="justify-content:center;"></div>
+	<div id="result" class="row alert-success h3" style="justify-content:center;"></div>
+	<div id="table"></div>
+	<div id="table2"></div>
+	<script>
+		"use strict"
+
+		/*  Auteur  : Levi CORMIER */
+
+		function drawNumbers() {
+			//Fonction qui retourne une liste de 5 nombres différents générés aléatoirement avec un max de 49
+			let drawLotoNumbers = []
+			let number = 0
+			//Double boucle qui verifie si les nombres sont différents et les inclus ensuite dans le tableau drawLotoNumbers
+			for (let i = 0; i < 5; i++) {
+				number = Math.ceil(Math.random() * 49);
+				while (drawLotoNumbers.includes(number)) {
+					number = Math.ceil(Math.random() * 49);
+				}
+				drawLotoNumbers.push(number)
+			} return drawLotoNumbers
+		}
+
+		function verifStarNumber(star) {
+			//Fonction qui compare le nombre étoile et le nombre entré par le joueur
+			if (star == document.getElementById("numberStar").value)
+				return true
+			else
+				return false
+		}
+
+		function check(LotoDraw, PlayerDraw) {
+			//Fonction qui retourne dans une liste le nombre de nombres en commun entre le joueur et le tirage LOTO
+			let count = 0;
+			let validNumbers = []
+			//Double boucle qui compare chaque nombre LOTO et chaque nombre joueur
+			//et retourne le nombre de nombres en commun et ajoute les nombres valides dans le tableau validNumbers
+			for (let i = 0; i < LotoDraw.length; i++) {
+				for (let j = 0; j < PlayerDraw.length; j++) {
+					if (LotoDraw[i] == PlayerDraw[j]) {
+						count++
+						validNumbers.push(PlayerDraw[j])
+						break
+					}
+				}
+			}
+			return [count, validNumbers]
+		}
+
+		function verifPlayerNb() {
+			//Fonction de sécurité qui vérifie si l'input du joueur est bien un nombre sur [1;49]
+			//Et [1;10]
+			let wrongInput = document.getElementById("erreur")
+			let a;
+			let verifNb = []
+			let star = document.getElementById("numberStar").value
+			for (let i = 0; i < 5; i++) {
+				a = document.getElementById("number" + (i + 1))
+				try {
+					if (verifNb.includes(a.value)) throw "Au moins deux entrées sont identiques.";
+					if (isNaN(a.value)) throw "Au moins une des entrées n'est pas un nombre.";
+					if (a.value == "") throw "Au moins une des entrées est vide";
+					if (a.value > 49 || a.value < 1) throw "Chaque entrée doit être comprise entre 1 et 49 inclus";
+					if (star > 10 || star < 1) throw "L'entrée du nombre étoile doit être comprise entre 1 et 10.";
+				}
+				catch (err) {
+					wrongInput.innerHTML = err
+					return false
+				}
+				verifNb.push(a.value)
+			}
+			wrongInput.innerHTML = "";
+			return true;
+		}
+
+		function playOnceButton() {
+			//Fonction du bouton `Jouer`, appelle les fonctions précédentes : verifPlayerNb; drawNumber;
+			//check; tirage du nombre étoile, affichage du tableau du joueur et du tirage
+			let verif = verifPlayerNb()
+			if (!verif)
+				return
+			let star = Math.ceil(Math.random() * 10)
+			let playerNumbers = []
+			let drawStart = drawNumbers()
+			let successfulInput = document.getElementById("result")
+			let table = document.getElementById("table")
+			let a;
+			let table2 = document.getElementById("table2")
+			let winnerNumbers = "<div class='container row'><div class='col-4 h2 center text-light'>Tirage:</div><table class='center col-8'>"
+			let Player = "<div class='container row'><div class='col-4 h2 center text-light'>Joueur:</div><table class='center col-8'>"
+			let display = ""
+			for (let i = 0; i < 5; i++) {
+				playerNumbers[i] = document.getElementById("number" + (i + 1)).value
+			}
+			let result = check(drawStart, playerNumbers);
+			if ((result[0] == 5) && (verifStarNumber(star))) {
+				//result[0] correspond à la première valeur retournée donc 'count' (variable compteur) de la fonction check
+				display = "Vous avez gagné le loto !"
+			} else if (result[0] > 1) {
+				display = "Vous avez " + result[0] + " nombres en commun, qui sont : " + result[1] + "."
+			} else if (result[0] == 1) {
+				display = "Vous avez 1 nombre en commun qui est " + result[1] + "."
+			} else {
+				display = "Vous n'avez pas de nombre en commun."
+			}
+			if (verifStarNumber(star))
+				display += "Vous avez trouvé le nombre étoile qui est: " + document.getElementById("numberStar").value
+			successfulInput.innerHTML = display
+			for (let j = 0; j < drawStart.length; j++) {
+				winnerNumbers += "<td class='btn btn-success rounded-circle tirageCenter' style='width: 100px; height: 100px;'>" + drawStart[j] + "</td>"
+			}
+			table.innerHTML = "<br>" + winnerNumbers + "<td class='btn btn-success rounded-circle tirageCenter' style='width: 100px; height: 100px;'>" + star + "</table></div>"
+			for (let l = 0; l < 6; l++) {
+				if (l == 5)
+					a = document.getElementById("numberStar")
+				else
+					a = document.getElementById("number" + (l + 1))
+				Player += "<td class='btn btn-primary rounded-circle tirageCenter' style='width: 100px; height: 100px;'>" + a.value + "</td>"
+			}
+			table2.innerHTML = "<br>" + Player + "</table class='center'></div>"
+		}
+
+		function whenWinButton() {
+			//fonction du bouton `A quand le jackpot ?`, qui cherche dans combien de tirages le joueur
+			//aurait gagné le LOTO : appel de drawNumbers; verifPlayerNb; check; comme pour un tirage 
+			let successfulInput = document.getElementById("result")
+			if (!verifPlayerNb())
+				return
+			let fonctionTirage = drawNumbers()
+			let NbJoueur = [];
+			for (let i = 0; i < 5; i++) {
+				NbJoueur[i] = document.getElementById("number" + (i + 1)).value
+			}
+			let count = 0
+			while (check(fonctionTirage, NbJoueur)[0] != 5) {
+				fonctionTirage = drawNumbers()
+				count++
+			}
+			let annee = Math.trunc(count / 52)
+			successfulInput.innerHTML = `Après ${count} essais, vous avez gagné le jackpot ! Il vous a fallu ${annee} ans à raison d'un tirage par semaine.`
+		}
+	</script>
+</body>
+
+</html>

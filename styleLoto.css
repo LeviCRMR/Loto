@@ -1,0 +1,36 @@
+html, head, body {
+    background-color: rgb(12, 31, 94);
+}
+h1{
+    text-align: center;
+}
+.imageLoto{
+    padding-right: 100px;
+}
+.gain{
+    background-color: rgb(255, 217, 50);
+    display: flex;
+    justify-content:center;
+}
+.btnwarning{
+    display: flex;
+    justify-content:center;
+}
+.center{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.tirageCenter{
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    text-align: center;
+}
+.tirageText{
+    
+    align-items: flex-end;
+    display:inline-flex;
+    justify-content:center;
+    text-align: center;
+}
